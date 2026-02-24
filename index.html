@@ -333,8 +333,6 @@
                 <i class="fas fa-map-marker-alt"></i>
             </div>
 
-            
-
             <div class="checkbox-group">
                 <input 
                     type="checkbox" 
@@ -362,7 +360,7 @@
             
             // Función para cargar datos del spreadsheet
             function loadSpreadsheetData() {
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbxr5vgG9ipMzAUuuNbGvhGg5ietWbgAii2ZKRdorvjEYfRQdwBRnc9od-oeTOudrMu4/exec';
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbx9lXt4uBFpHloLqEwegmvgRZMY2FJjwdsphqwEc4JgY9oYIX8WnWwNyAlorGGWS5H4/exec';
                 
                 fetch(`${scriptURL}?action=getCounts`)
                     .then(response => {
@@ -426,25 +424,9 @@
                 updateVehicleIcon();
             }
 
-            // Mostrar/ocultar campo de descripción de documentos
-            function toggleDescripcionField() {
-                if (documentosSelect.value === 'No') {
-                    descripcionGroup.style.display = 'block';
-                    descripcionTextarea.setAttribute('required', 'required');
-                } else {
-                    descripcionGroup.style.display = 'none';
-                    descripcionTextarea.removeAttribute('required');
-                    descripcionTextarea.value = '';
-                }
-            }
+            
 
-            // Event listeners
-            tipoVehiculoSelect.addEventListener('change', toggleCarFields);
-            documentosSelect.addEventListener('change', toggleDescripcionField);
-
-            // Ejecutar una vez al inicio para establecer estado correcto
-            toggleCarFields();
-            toggleDescripcionField();
+            
             
             // Manejo del envío del formulario
             document.querySelector('.form-container form').addEventListener('submit', function (event) {
@@ -455,40 +437,21 @@
                 const nombre = formData.get('Nombre completo').trim();
                 const cedula = formData.get('Cédula').trim();
                 const celular = formData.get('Celular').trim();
-                const iglesia = formData.get('Iglesia que se congrega');
-                const tipoVehiculo = formData.get('Tipo de vehículo');
-                const documentos = formData.get('Documentos al día');
-                const auxilio = formData.get('Auxilio de gasolina');
+                const iglesia = formData.get('Iglesia que se congrega'); // NUEVA VALIDACIÓN
+                
                 const data = {};
                 
                 formData.forEach((value, key) => {
                     data[key] = value;
                 });
                 
-                // Validación de campos obligatorios
-                if (!nombre || !cedula || !celular || !iglesia || !tipoVehiculo || !documentos || !auxilio) {
+                // Validación de campos obligatorios (INCLUYE IGLESIA)
+                if (!nombre || !cedula || !celular || !iglesia ) {
                     showCustomAlert('Por favor, completa todos los campos requeridos.', 'warning');
                     return;
                 }
 
-                // Validación de campos de carro si es necesario
-                if (tipoVehiculo === 'Carro') {
-                    const marca = formData.get('Marca de vehículo')?.trim();
-                    const modelo = formData.get('Modelo de vehículo')?.trim();
-                    if (!marca || !modelo) {
-                        showCustomAlert('Por favor, completa la marca y modelo del vehículo.', 'warning');
-                        return;
-                    }
-                }
-
-                // Validación de descripción de documentos si seleccionó "No"
-                if (documentos === 'No') {
-                    const descripcion = formData.get('Descripción documentos')?.trim();
-                    if (!descripcion) {
-                        showCustomAlert('Por favor, proporciona una pequeña descripción sobre los documentos.', 'warning');
-                        return;
-                    }
-                }
+                
 
                 // Validación del checkbox de autorización
                 const autorizacionCheckbox = document.getElementById('autorizacion');
@@ -505,8 +468,7 @@
 
             // Función para enviar datos al servidor
             function sendDataToServer(data, form) {
-                const scriptURL = "https://script.google.com/macros/s/AKfycbxr5vgG9ipMzAUuuNbGvhGg5ietWbgAii2ZKRdorvjEYfRQdwBRnc9od-oeTOudrMu4/exec";
-                
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbx9lXt4uBFpHloLqEwegmvgRZMY2FJjwdsphqwEc4JgY9oYIX8WnWwNyAlorGGWS5H4/exec';
                 fetch(scriptURL, {
                     method: 'POST',
                     headers: {
@@ -519,10 +481,7 @@
                     hideLoadingSpinner();
                     showCustomAlert('¡Formulario enviado con éxito! Gracias por tu registro.', 'success');
                     form.reset();
-                    // Actualizar campos condicionales después de reset
-                    toggleCarFields();
-                    toggleDescripcionField();
-                    updateVehicleIcon();
+                    
                     // Recargar datos después de enviar
                     loadSpreadsheetData();
                 })
